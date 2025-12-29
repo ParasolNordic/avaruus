@@ -843,9 +843,11 @@ function initGame(playerNumber, playerCount, bounceEnabled) {
 }
 
 function generateObstacles() {
+    console.log('🔥🔥🔥 DEBUG: generateObstacles() ALOITETTU! 🔥🔥🔥');
     gameState.obstacles = [];
     // Satunnainen määrä 8-12 estettä
     const obstacleCount = Math.floor(Math.random() * 5) + 8; // 8, 9, 10, 11 tai 12
+    console.log(`🔥 DEBUG: Yritetään luoda ${obstacleCount} estettä`);
     const minDistance = 150;
     
     for (let i = 0; i < obstacleCount; i++) {
@@ -862,10 +864,14 @@ function generateObstacles() {
         
         if (attempts < 100) {
             gameState.obstacles.push(new Obstacle(x, y, radius));
+            console.log(`✅ DEBUG: Este ${i+1} luotu: x=${Math.round(x)}, y=${Math.round(y)}, r=${Math.round(radius)}`);
+        } else {
+            console.log(`❌ DEBUG: Este ${i+1} EPÄONNISTUI (liian monta yritystä)`);
         }
     }
     
-    console.log(`🪐 Generoitu ${gameState.obstacles.length} estettä`);
+    console.log(`🪐🪐🪐 VALMIS: Generoitu ${gameState.obstacles.length} estettä (tavoite oli ${obstacleCount}) 🪐🪐🪐`);
+    console.log('Esteet:', gameState.obstacles);
 }
 
 function isValidObstaclePosition(x, y, radius, minDistance) {
