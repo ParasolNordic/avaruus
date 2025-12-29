@@ -16,13 +16,13 @@ let gameState = {
 let keys = {};
 let myShip = null;
 
-// Generoi tähdet taustalle
+// Generoi tähdet taustalle (pelialueelle)
 function generateStars() {
     gameState.stars = [];
     for (let i = 0; i < 150; i++) {
         gameState.stars.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
+            x: Math.random() * canvas.width,  // 0-1000
+            y: Math.random() * canvas.height, // 0-550
             size: Math.random() * 2,
             brightness: Math.random()
         });
@@ -1221,6 +1221,8 @@ function setupGameSocketEvents() {
     });
 
     socket.on('newRound', (data) => {
+        console.log('📢 Uusi kierros alkaa!');
+        resetRound();
         if (data.scores) {
             updateScores(data.scores);
         }
