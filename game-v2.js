@@ -142,133 +142,151 @@ class Ship {
     }
     
     drawXWing() {
-        // X-Wing hävittäjä (valkoinen) - edestäpäin katsottuna
+        // X-Wing TÄSMÄLLEEN referenssikuvan mukaan
+        // Koordinaatit: negatiivinen Y = ylös (edessä), positiivinen Y = alas (takana)
+        
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#aaaaaa';
         ctx.lineWidth = 2;
         
-        // Pitkä nokka (edessä, kapea)
+        // PITKÄ NOKKA (terävä kärki ylhäällä)
         ctx.beginPath();
-        ctx.moveTo(-2, -25);
-        ctx.lineTo(0, -30);
-        ctx.lineTo(2, -25);
+        ctx.moveTo(0, -32);      // Terävä kärki
+        ctx.lineTo(-3, -26);
+        ctx.lineTo(-3, -15);
+        ctx.lineTo(3, -15);
+        ctx.lineTo(3, -26);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        ctx.fillRect(-2, -25, 4, 15);
-        ctx.strokeRect(-2, -25, 4, 15);
-        
-        // Ohjaamo (kupoli)
+        // OHJAAMON KUPOLI (sininen kuusikulmio ikkunalla)
+        ctx.fillStyle = '#e0e0e0';
         ctx.beginPath();
-        ctx.arc(0, -12, 6, 0, Math.PI * 2);
+        ctx.moveTo(0, -16);
+        ctx.lineTo(-5, -12);
+        ctx.lineTo(-5, -6);
+        ctx.lineTo(0, -2);
+        ctx.lineTo(5, -6);
+        ctx.lineTo(5, -12);
+        ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // Ikkuna ohjaamossa
+        // Ikkuna (sininen)
         ctx.fillStyle = '#4169E1';
         ctx.beginPath();
-        ctx.arc(0, -12, 3, 0, Math.PI * 2);
+        ctx.moveTo(0, -14);
+        ctx.lineTo(-3, -10);
+        ctx.lineTo(-3, -6);
+        ctx.lineTo(0, -4);
+        ctx.lineTo(3, -6);
+        ctx.lineTo(3, -10);
+        ctx.closePath();
         ctx.fill();
         
-        // Keskiosa (runko)
+        // RUNKO (keskiosa, pyöreähkö)
         ctx.fillStyle = '#ffffff';
-        ctx.fillRect(-5, -10, 10, 25);
-        ctx.strokeRect(-5, -10, 10, 25);
-        
-        // S-foils (4 siipeä X-muodossa) - valkoiset
-        ctx.fillStyle = '#e0e0e0';
-        
-        // Ylävasen siipi (pitkä ja kapea)
         ctx.beginPath();
-        ctx.moveTo(-5, -8);
-        ctx.lineTo(-22, -24);
-        ctx.lineTo(-24, -24);
-        ctx.lineTo(-24, -20);
-        ctx.lineTo(-7, -6);
+        ctx.moveTo(-6, -4);
+        ctx.lineTo(-8, 8);
+        ctx.lineTo(-6, 18);
+        ctx.lineTo(6, 18);
+        ctx.lineTo(8, 8);
+        ctx.lineTo(6, -4);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // Moottori ylävasemmalla (pitkä putki)
-        ctx.fillStyle = '#cccccc';
-        ctx.fillRect(-26, -25, 4, 7);
-        ctx.strokeRect(-26, -25, 4, 7);
-        // Punainen hehku
-        ctx.fillStyle = '#ff3333';
-        ctx.fillRect(-26, -22, 4, 3);
+        // === 4 SIIPEÄ X-MUODOSSA ===
         
-        // Yläoikea siipi
+        // YLÄVASEN SIIPI (kulma 45° vasemmalle ylös)
         ctx.fillStyle = '#e0e0e0';
         ctx.beginPath();
-        ctx.moveTo(5, -8);
-        ctx.lineTo(22, -24);
-        ctx.lineTo(24, -24);
-        ctx.lineTo(24, -20);
-        ctx.lineTo(7, -6);
+        ctx.moveTo(-6, 2);
+        ctx.lineTo(-14, -6);
+        ctx.lineTo(-22, -14);
+        ctx.lineTo(-24, -14);
+        ctx.lineTo(-24, -10);
+        ctx.lineTo(-16, -2);
+        ctx.lineTo(-8, 2);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // Moottori yläoikealla
+        // Moottoriputki ylävasemmalla
         ctx.fillStyle = '#cccccc';
-        ctx.fillRect(22, -25, 4, 7);
-        ctx.strokeRect(22, -25, 4, 7);
-        // Punainen hehku
+        ctx.fillRect(-27, -16, 5, 8);
+        ctx.strokeRect(-27, -16, 5, 8);
+        // Punainen liekki
         ctx.fillStyle = '#ff3333';
-        ctx.fillRect(22, -22, 4, 3);
+        ctx.fillRect(-27, -15, 5, 3);
         
-        // Alavasen siipi
+        // YLÄOIKEA SIIPI (kulma 45° oikealle ylös)
         ctx.fillStyle = '#e0e0e0';
         ctx.beginPath();
-        ctx.moveTo(-5, 10);
-        ctx.lineTo(-22, 24);
+        ctx.moveTo(6, 2);
+        ctx.lineTo(14, -6);
+        ctx.lineTo(22, -14);
+        ctx.lineTo(24, -14);
+        ctx.lineTo(24, -10);
+        ctx.lineTo(16, -2);
+        ctx.lineTo(8, 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Moottoriputki yläoikealla
+        ctx.fillStyle = '#cccccc';
+        ctx.fillRect(22, -16, 5, 8);
+        ctx.strokeRect(22, -16, 5, 8);
+        // Punainen liekki
+        ctx.fillStyle = '#ff3333';
+        ctx.fillRect(22, -15, 5, 3);
+        
+        // ALAVASEN SIIPI (kulma 45° vasemmalle alas)
+        ctx.fillStyle = '#e0e0e0';
+        ctx.beginPath();
+        ctx.moveTo(-6, 12);
+        ctx.lineTo(-14, 20);
+        ctx.lineTo(-22, 28);
+        ctx.lineTo(-24, 28);
         ctx.lineTo(-24, 24);
-        ctx.lineTo(-24, 20);
-        ctx.lineTo(-7, 8);
+        ctx.lineTo(-16, 16);
+        ctx.lineTo(-8, 12);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // Moottori alavasemmalla
+        // Moottoriputki alavasemmalla
         ctx.fillStyle = '#cccccc';
-        ctx.fillRect(-26, 18, 4, 7);
-        ctx.strokeRect(-26, 18, 4, 7);
-        // Punainen hehku
+        ctx.fillRect(-27, 24, 5, 8);
+        ctx.strokeRect(-27, 24, 5, 8);
+        // Punainen liekki
         ctx.fillStyle = '#ff3333';
-        ctx.fillRect(-26, 19, 4, 3);
+        ctx.fillRect(-27, 28, 5, 3);
         
-        // Alaoikea siipi
+        // ALAOIKEA SIIPI (kulma 45° oikealle alas)
         ctx.fillStyle = '#e0e0e0';
         ctx.beginPath();
-        ctx.moveTo(5, 10);
-        ctx.lineTo(22, 24);
+        ctx.moveTo(6, 12);
+        ctx.lineTo(14, 20);
+        ctx.lineTo(22, 28);
+        ctx.lineTo(24, 28);
         ctx.lineTo(24, 24);
-        ctx.lineTo(24, 20);
-        ctx.lineTo(7, 8);
+        ctx.lineTo(16, 16);
+        ctx.lineTo(8, 12);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // Moottori alaoikealla
+        // Moottoriputki alaoikealla
         ctx.fillStyle = '#cccccc';
-        ctx.fillRect(22, 18, 4, 7);
-        ctx.strokeRect(22, 18, 4, 7);
-        // Punainen hehku
+        ctx.fillRect(22, 24, 5, 8);
+        ctx.strokeRect(22, 24, 5, 8);
+        // Punainen liekki
         ctx.fillStyle = '#ff3333';
-        ctx.fillRect(22, 19, 4, 3);
-        
-        // Yksityiskohtia runkoon (viivat)
-        ctx.strokeStyle = '#aaaaaa';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(-5, 0);
-        ctx.lineTo(5, 0);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(-5, 8);
-        ctx.lineTo(5, 8);
-        ctx.stroke();
+        ctx.fillRect(22, 28, 5, 3);
     }
     
     drawTIEFighter() {
@@ -848,7 +866,7 @@ function generateObstacles() {
     // Satunnainen määrä 8-12 estettä
     const obstacleCount = Math.floor(Math.random() * 5) + 8; // 8, 9, 10, 11 tai 12
     console.log(`🔥 DEBUG: Yritetään luoda ${obstacleCount} estettä`);
-    const minDistance = 150;
+    const minDistance = 80; // PIENENNETTY 150 → 80
     
     for (let i = 0; i < obstacleCount; i++) {
         let x, y, radius;
@@ -892,8 +910,8 @@ function isValidObstaclePosition(x, y, radius, minDistance) {
         { x: canvas.width / 2, y: 200 }
     ];
     
-    // Suurempi turvavyöhyke pelaajien ympärillä
-    const playerSafetyDistance = 180;
+    // Turvavyöhyke pelaajien ympärillä (pienennetty 180 → 120)
+    const playerSafetyDistance = 120;
     
     for (let pos of startPositions) {
         const dx = x - pos.x;
