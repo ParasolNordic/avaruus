@@ -845,6 +845,10 @@
         
         function playAgain() {
             hideWinDialog();
+            // Resetoi peli heti
+            if (typeof resetRound === 'function') {
+                resetRound();
+            }
             // Lähetetään socketilla tieto uudesta kierroksesta
             if (typeof socket !== 'undefined' && socket.emit) {
                 socket.emit('newRound');
@@ -853,6 +857,6 @@
         
         console.log('🚀 Star Wars Space Battle main program loaded!');
     </script>
-    <script src="game-v2.js?v=3.1"></script>
+    <script src="game-v2.js?v=3.2"></script>
 </body>
 </html>
