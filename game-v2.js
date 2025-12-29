@@ -1,4 +1,4 @@
-// ═ ══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // STAR WARS SPACE BATTLE - PELILOGIIKKA
 // ═══════════════════════════════════════════════════════════
 
@@ -939,6 +939,9 @@ function isValidObstaclePosition(x, y, radius, minDistance) {
 }
 
 function checkGameOver() {
+    // Estä usean pisteen antaminen samassa pelissä
+    if (gameState.gameOver) return;
+    
     const alivePlayers = gameState.ships.filter(s => s.alive);
     
     if (alivePlayers.length === 1) {
@@ -950,6 +953,7 @@ function checkGameOver() {
             showWinDialog(alivePlayers[0].name);
         }, 1000);
         
+        // Lähetä roundEnd VAIN KERRAN
         socket.emit('roundEnd', { winner });
     } else if (alivePlayers.length === 0) {
         gameState.gameOver = true;
