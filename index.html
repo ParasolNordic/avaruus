@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Star Wars Space Battle</title>
+    <title>Tankkk Online</title>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
@@ -22,20 +22,10 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: #000000;
-            font-family: 'Arial', sans-serif;
-            color: #FFE81F;
+            background: #1a1a1a;
+            font-family: 'Courier New', monospace;
+            color: #fff;
             overflow: hidden;
-            background-image: radial-gradient(2px 2px at 20% 30%, white, transparent),
-                              radial-gradient(2px 2px at 60% 70%, white, transparent),
-                              radial-gradient(1px 1px at 50% 50%, white, transparent);
-            background-size: 200px 200px;
-            animation: twinkle 3s infinite;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
         }
         
         /* HERÄTYSVIESTI TYYLIT */
@@ -45,7 +35,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.98);
+            background: rgba(0, 0, 0, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -61,8 +51,8 @@
         .wakeup-spinner {
             width: 80px;
             height: 80px;
-            border: 8px solid rgba(255, 232, 31, 0.1);
-            border-top: 8px solid #FFE81F;
+            border: 8px solid rgba(255, 255, 255, 0.1);
+            border-top: 8px solid #4CAF50;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 30px;
@@ -75,24 +65,22 @@
         
         .wakeup-message {
             font-size: 24px;
-            color: #FFE81F;
+            color: #4CAF50;
             margin-bottom: 20px;
             text-align: center;
             padding: 0 20px;
-            text-shadow: 0 0 10px rgba(255, 232, 31, 0.5);
         }
         
         .wakeup-timer {
             font-size: 48px;
-            color: #4169E1;
+            color: #FFD700;
             font-weight: bold;
             margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(65, 105, 225, 0.8);
         }
         
         .wakeup-subtitle {
             font-size: 16px;
-            color: #888;
+            color: #999;
             text-align: center;
             max-width: 400px;
             line-height: 1.5;
@@ -118,71 +106,43 @@
             display: flex;
         }
         
+        .menu-logo {
+            max-width: 400px;
+            width: 80%;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        
         .menu-title {
-            font-size: 42px;
+            font-size: 36px;
             margin-bottom: 30px;
-            color: #FFE81F;
-            text-shadow: 0 0 30px rgba(255, 232, 31, 0.8),
-                         0 0 60px rgba(255, 232, 31, 0.4);
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
             font-weight: bold;
-            letter-spacing: 4px;
-        }
-        
-        .star-wars-logo {
-            font-size: 56px;
-            color: #FFE81F;
-            text-shadow: 0 0 30px rgba(255, 232, 31, 0.8);
-            margin-bottom: 10px;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-        
-        .subtitle {
-            font-size: 20px;
-            color: #4169E1;
-            text-shadow: 0 0 10px rgba(65, 105, 225, 0.6);
-            margin-bottom: 40px;
-            letter-spacing: 3px;
         }
         
         .menu-btn {
             font-size: 20px;
             padding: 15px 30px;
             cursor: pointer;
-            color: #000;
-            border: 3px solid #FFE81F;
+            color: white;
+            border: none;
             border-radius: 10px;
-            font-family: Arial, sans-serif;
+            font-family: 'Courier New', monospace;
             font-weight: bold;
-            box-shadow: 0 0 20px rgba(255, 232, 31, 0.4),
-                        inset 0 0 10px rgba(255, 232, 31, 0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
             margin: 10px;
-            transition: all 0.3s;
-            background: linear-gradient(135deg, #FFE81F, #FFC800);
+            transition: transform 0.2s;
         }
         
         .menu-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(255, 232, 31, 0.8),
-                        inset 0 0 20px rgba(255, 232, 31, 0.3);
         }
         
         .menu-btn:active {
             transform: scale(0.95);
-        }
-        
-        .menu-btn.secondary {
-            background: linear-gradient(135deg, #4169E1, #1E3A8A);
-            border-color: #4169E1;
-            color: #fff;
-            box-shadow: 0 0 20px rgba(65, 105, 225, 0.4);
-        }
-        
-        .menu-btn.back {
-            background: #333;
-            border-color: #666;
-            color: #fff;
-            box-shadow: none;
         }
         
         #qrcode {
@@ -190,23 +150,20 @@
             padding: 20px;
             border-radius: 10px;
             margin: 20px 0;
-            box-shadow: 0 0 30px rgba(255, 232, 31, 0.3);
         }
         
         #roomCode {
             font-size: 48px;
             font-weight: bold;
-            color: #FFE81F;
-            letter-spacing: 15px;
+            color: #4CAF50;
+            letter-spacing: 10px;
             margin: 20px 0;
-            text-shadow: 0 0 20px rgba(255, 232, 31, 0.6);
         }
         
         #status {
-            color: #4169E1;
+            color: #FFD700;
             margin: 15px 0;
             font-size: 18px;
-            text-shadow: 0 0 10px rgba(65, 105, 225, 0.5);
         }
         
         .code-input {
@@ -214,15 +171,12 @@
             font-size: 32px;
             width: 250px;
             text-align: center;
-            border: 3px solid #FFE81F;
+            border: 3px solid #4CAF50;
             border-radius: 10px;
             margin: 20px 0;
             text-transform: uppercase;
             font-family: 'Courier New', monospace;
             font-weight: bold;
-            background: #1a1a1a;
-            color: #FFE81F;
-            box-shadow: 0 0 20px rgba(255, 232, 31, 0.3);
         }
         
         /* PELI TYYLIT */
@@ -233,7 +187,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding-bottom: 160px;
+            padding-bottom: 160px; /* Tilaa ohjaimille */
         }
         
         #gameContainer.show {
@@ -249,41 +203,29 @@
         #info {
             padding: 5px 10px;
             text-align: center;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: none;
-            border-radius: 5px;
         }
         
         #scores {
             display: flex;
             gap: 30px;
             justify-content: center;
-            font-size: 16px;
+            font-size: 20px;
             font-weight: bold;
         }
         
-        .player1-score { 
-            color: #ffffff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-        .player2-score { 
-            color: #708090;
-            text-shadow: 0 0 10px rgba(112, 128, 144, 0.5);
-        }
-        .player3-score { 
-            color: #9e9e9e;
-            text-shadow: 0 0 10px rgba(158, 158, 158, 0.5);
-        }
+        .player1-score { color: #00FF00; }
+        .player2-score { color: #FF5722; }
+        .player3-score { color: #2196F3; }
         
         #gameCanvas {
             background: #000;
             display: block;
-            border: 3px solid #FFE81F;
-            box-shadow: 0 0 30px rgba(255, 232, 31, 0.3);
+            border: 3px solid #333;
         }
         
         #message {
@@ -294,12 +236,10 @@
             padding: 10px 20px;
             text-align: center;
             font-size: 18px;
-            color: #FFE81F;
+            color: #FFD700;
             background: rgba(0, 0, 0, 0.9);
             border-radius: 5px;
             z-index: 100;
-            border: 2px solid #FFE81F;
-            text-shadow: 0 0 10px rgba(255, 232, 31, 0.6);
         }
         
         /* OHJAIMET */
@@ -367,89 +307,122 @@
             grid-column: 2;
             grid-row: 2;
         }
+        
+        .player1-controls .control-btn {
+            border-color: #00FF00;
+            background: rgba(0, 255, 0, 0.2);
+        }
+        
+        .player1-controls .shoot-btn {
+            border-color: #00FF00;
+            background: rgba(0, 255, 0, 0.3);
+            color: #00FF00;
+        }
+        
+        .player2-controls .control-btn {
+            border-color: #FF5722;
+            background: rgba(255, 87, 34, 0.2);
+        }
+        
+        .player2-controls .shoot-btn {
+            border-color: #FF5722;
+            background: rgba(255, 87, 34, 0.3);
+            color: #FF5722;
+        }
+        
+        .player3-controls .control-btn {
+            border-color: #2196F3;
+            background: rgba(33, 150, 243, 0.2);
+        }
+        
+        .player3-controls .shoot-btn {
+            border-color: #2196F3;
+            background: rgba(33, 150, 243, 0.3);
+            color: #2196F3;
+        }
     </style>
 </head>
 <body>
     <!-- HERÄTYSVIESTI -->
     <div id="wakeupScreen">
         <div class="wakeup-spinner"></div>
-        <div class="wakeup-message">Activating hyperdrive...</div>
+        <div class="wakeup-message">Herätetään palvelinta...</div>
         <div class="wakeup-timer" id="wakeupTimer">30</div>
         <div class="wakeup-subtitle">
-            The server is waking up from standby mode.<br>
-            This takes about 30 seconds on first connection.
+            Palvelin oli nukkumassa säästääkseen resursseja.<br>
+            Tämä kestää noin 30 sekuntia ensimmäisellä kerralla.
         </div>
     </div>
 
     <!-- PÄÄVALIKKO -->
     <div id="mainMenu" class="menu-screen show">
-        <div class="star-wars-logo">★ STAR WARS ★</div>
-        <div class="subtitle">SPACE BATTLE</div>
-        <div id="status">Connecting to battle station...</div>
+        <img src="https://parasolnordic.github.io/vibes/tankkk_online.png" alt="Tankkk Online" class="menu-logo">
+        <div class="menu-title">TANKKK ONLINE</div>
+        <div id="status">Yhdistetään palvelimeen...</div>
         <div id="mainButtons" style="display:none;">
-            <button class="menu-btn" onclick="showCreateMenu()">
-                🚀 CREATE BATTLE
+            <button class="menu-btn" style="background: #4CAF50;" onclick="showCreateMenu()">
+                📱 LUO PELI (QR-koodi)
             </button>
-            <button class="menu-btn secondary" onclick="showJoinMenu()">
-                🎯 JOIN BATTLE
+            <button class="menu-btn" style="background: #2196F3;" onclick="showJoinMenu()">
+                🔢 LIITY PELIIN
             </button>
         </div>
     </div>
 
     <!-- LUO PELI MENU -->
     <div id="createMenu" class="menu-screen">
-        <div class="menu-title">SELECT SQUADRON SIZE</div>
-        <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
-            <button class="menu-btn" onclick="selectPlayers(2)">
-                2 PILOTS
+        <div class="menu-title">LUO UUSI PELI</div>
+        <div id="playerSelect" style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+            <button class="menu-btn" style="background: #4CAF50;" onclick="selectPlayers(2)">
+                2 PELAAJAA
             </button>
-            <button class="menu-btn secondary" onclick="selectPlayers(3)">
-                3 PILOTS
+            <button class="menu-btn" style="background: #2196F3;" onclick="selectPlayers(3)">
+                3 PELAAJAA
             </button>
         </div>
-        <button class="menu-btn back" style="margin-top:30px;" onclick="backToMain()">
-            ← BACK
+        <button class="menu-btn" style="background: #666; margin-top:30px;" onclick="backToMain()">
+            ← TAKAISIN
         </button>
     </div>
 
     <!-- AMMUKSET VALINTA -->
     <div id="bounceMenu" class="menu-screen">
-        <div class="menu-title">LASER MODE</div>
+        <div class="menu-title">AMMUKSET</div>
         <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
-            <button class="menu-btn" onclick="createGame(true)">
-                ⚡ RICOCHETING
+            <button class="menu-btn" style="background: #FF9800;" onclick="createGame(true)">
+                KIMPOAVAT
             </button>
-            <button class="menu-btn secondary" onclick="createGame(false)">
-                🎯 DIRECT FIRE
+            <button class="menu-btn" style="background: #9C27B0;" onclick="createGame(false)">
+                EIVÄT KIMPOA
             </button>
         </div>
-        <button class="menu-btn back" style="margin-top:30px;" onclick="backToCreate()">
-            ← BACK
+        <button class="menu-btn" style="background: #666; margin-top:30px;" onclick="backToCreate()">
+            ← TAKAISIN
         </button>
     </div>
 
     <!-- ODOTETAAN PELAAJIA -->
     <div id="waitingRoom" class="menu-screen">
-        <div class="menu-title">AWAITING PILOTS</div>
+        <div class="menu-title">ODOTA PELAAJIA</div>
         <div id="roomCode"></div>
         <div id="qrcode"></div>
-        <div id="waitingStatus" style="margin-top:20px; font-size:18px; color:#FFE81F;"></div>
-        <p style="margin-top:20px; color:#888;">
-            Other pilots can scan the QR code<br>
-            or enter the code in the join menu
+        <div id="waitingStatus" style="margin-top:20px; font-size:18px; color:#FFD700;"></div>
+        <p style="margin-top:20px; color:#999;">
+            Toiset pelaajat voivat skannata QR-koodin<br>
+            tai kirjoittaa koodin liity-valikossa
         </p>
     </div>
 
     <!-- LIITY PELIIN -->
     <div id="joinMenu" class="menu-screen">
-        <div class="menu-title">JOIN BATTLE</div>
-        <p style="margin-bottom:20px; color:#888;">Enter the 4-character battle code:</p>
+        <div class="menu-title">LIITY PELIIN</div>
+        <p style="margin-bottom:20px; color:#999;">Anna pelin nelikirjaiminen koodi:</p>
         <input type="text" id="codeInput" class="code-input" placeholder="XXXX" maxlength="4">
-        <button class="menu-btn" onclick="joinGame()">
-            JOIN
+        <button class="menu-btn" style="background: #4CAF50;" onclick="joinGame()">
+            LIITY
         </button>
-        <button class="menu-btn back" style="margin-top:20px;" onclick="backToMain()">
-            ← BACK
+        <button class="menu-btn" style="background: #666; margin-top:20px;" onclick="backToMain()">
+            ← TAKAISIN
         </button>
     </div>
 
@@ -460,10 +433,10 @@
             
             <div id="info">
                 <div id="scores">
-                    <div class="player1-score">X-Wing: <span id="score-p1">0</span></div>
-                    <div class="player2-score">TIE Fighter: <span id="score-p2">0</span></div>
+                    <div class="player1-score">Pelaaja 1: <span id="p1Score">0</span></div>
+                    <div class="player2-score">Pelaaja 2: <span id="p2Score">0</span></div>
                     <div class="player3-score" id="p3ScoreContainer" style="display:none;">
-                        Falcon: <span id="score-p3">0</span>
+                        Pelaaja 3: <span id="p3Score">0</span>
                     </div>
                 </div>
             </div>
@@ -472,34 +445,33 @@
         <div id="message"></div>
         
         <div id="controls" style="display:none;">
-            <!-- Ohjaimet generoidaan JavaScriptillä -->
+            <!-- Ohjaimet generoidaan JavaScriptillä pelaajamäärän mukaan -->
         </div>
     </div>
 
-    <!-- Ladataan game.js ENSIN -->
-    <script src="game.js"></script>
-    
-    <!-- Sitten pääohjelma -->
     <script>
         // ═══════════════════════════════════════════════════════════
         // PALVELINYHTEYS JA HERÄTYSVIESTI
         // ═══════════════════════════════════════════════════════════
         
-        const SERVER_URL = window.location.origin;
+        const SERVER_URL = window.location.origin; // Automaattinen Renderissa
         let socket = null;
         let isConnected = false;
         let wakeupStartTime = null;
         
+        // Näytä herätysviesti
         function showWakeupScreen() {
             document.getElementById('wakeupScreen').classList.add('show');
             wakeupStartTime = Date.now();
             updateWakeupTimer();
         }
         
+        // Piilota herätysviesti
         function hideWakeupScreen() {
             document.getElementById('wakeupScreen').classList.remove('show');
         }
         
+        // Päivitä aikalaskuri
         function updateWakeupTimer() {
             if (!wakeupStartTime) return;
             
@@ -515,9 +487,10 @@
             }
         }
         
+        // Yhdistä palvelimeen
         function connectToServer() {
             showWakeupScreen();
-            document.getElementById('status').textContent = 'Connecting to battle station...';
+            document.getElementById('status').textContent = 'Yhdistetään palvelimeen...';
             
             socket = io(SERVER_URL, {
                 transports: ['websocket', 'polling'],
@@ -525,42 +498,44 @@
                 reconnection: true,
                 reconnectionDelay: 1000,
                 reconnectionAttempts: 10,
-                debug: true,
-                forceNew: true
+                debug: true, // DEBUG MODE
+                forceNew: true // Ei välimuistia
             });
             
+            // DEBUGGAUS: Kuuntele KAIKKIA eventtejä
             socket.onAny((eventName, ...args) => {
                 console.log(`📥 SOCKET EVENT: ${eventName}`, args);
             });
             
             socket.on('connect', () => {
-                console.log('✅ Connected to battle station!');
+                console.log('✅ Yhdistetty palvelimeen!');
                 console.log('🆔 Socket ID:', socket.id);
                 isConnected = true;
                 hideWakeupScreen();
-                document.getElementById('status').textContent = 'Ready for combat! Select mode.';
+                document.getElementById('status').textContent = 'Yhdistetty! Valitse pelimuoto.';
                 document.getElementById('mainButtons').style.display = 'block';
                 
-                console.log('📞 Calling setupGameEvents()...');
+                // Rekisteröi pelin tapahtumat vasta yhteyden jälkeen
+                console.log('📞 Kutsutaan setupGameEvents()...');
                 setupGameEvents();
-                console.log('✅ setupGameEvents() completed!');
+                console.log('✅ setupGameEvents() suoritettu!');
             });
             
             socket.on('serverAwake', (data) => {
-                console.log('🟢 Server is awake:', data);
+                console.log('🟢 Palvelin on hereillä:', data);
                 isConnected = true;
                 hideWakeupScreen();
             });
             
             socket.on('disconnect', () => {
-                console.log('❌ Connection lost');
+                console.log('❌ Yhteys katkesi');
                 isConnected = false;
-                document.getElementById('status').textContent = 'Connection lost. Reconnecting...';
+                document.getElementById('status').textContent = 'Yhteys katkesi. Yritetään uudelleen...';
             });
             
             socket.on('connect_error', (error) => {
-                console.log('⚠️ Connection error:', error);
-                document.getElementById('status').textContent = 'Waking up server, please wait...';
+                console.log('⚠️ Yhteysvirhe:', error);
+                document.getElementById('status').textContent = 'Herätetään palvelinta, odota...';
             });
             
             socket.on('error', (data) => {
@@ -568,13 +543,16 @@
             });
         }
         
+        // Käynnistä yhteys
         window.addEventListener('load', () => {
+            // Tarkista URL-parametrit (QR-koodilla liittyminen)
             const urlParams = new URLSearchParams(window.location.search);
             const joinCode = urlParams.get('join');
             
             connectToServer();
             
             if (joinCode) {
+                // QR-koodilla skannattiin
                 setTimeout(() => {
                     document.getElementById('codeInput').value = joinCode.toUpperCase();
                     showJoinMenu();
@@ -583,35 +561,43 @@
             }
         });
         
+        // Rekisteröi pelin tapahtumat
         function setupGameEvents() {
-            console.log('🔧 Registering game events...');
+            console.log('🔧 Rekisteröidään game events...');
             
+            // Kun pelaaja liittyy
             socket.on('playerJoined', (data) => {
                 console.log('👥 EVENT: playerJoined', data);
                 updateWaitingStatus(data.totalPlayers, gameSettings.playerCount);
             });
             
+            // Kun kaikki paikalla
             socket.on('allPlayersJoined', () => {
-                console.log('✅✅✅ EVENT RECEIVED: allPlayersJoined!');
-                document.getElementById('waitingStatus').textContent = 'All pilots ready! Starting battle...';
+                console.log('✅✅✅ EVENT VASTAANOTETTU: allPlayersJoined!');
+                console.log('📍 Päivitetään status...');
+                document.getElementById('waitingStatus').textContent = 'Kaikki paikalla! Aloitetaan peli...';
+                console.log('⏰ Odotetaan 2 sekuntia...');
                 setTimeout(() => {
-                    console.log('🎮 CALLING startGame()!');
+                    console.log('🎮 KUTSUTAAN startGame()!');
                     startGame();
                 }, 2000);
             });
             
-            console.log('✅ allPlayersJoined event registered!');
+            console.log('✅ allPlayersJoined event rekisteröity!');
             
+            // Pelin luonti onnistui
             socket.on('gameCreated', (data) => {
                 currentRoomCode = data.roomCode;
                 myPlayerNumber = data.playerNumber;
                 
-                console.log('✅ Battle created:', currentRoomCode);
+                console.log('✅ Peli luotu:', currentRoomCode);
                 
+                // Näytä odotusruutu
                 hideAllMenus();
                 document.getElementById('waitingRoom').classList.add('show');
                 document.getElementById('roomCode').textContent = currentRoomCode;
                 
+                // Luo QR-koodi
                 const qrContainer = document.getElementById('qrcode');
                 qrContainer.innerHTML = '';
                 const url = window.location.origin + window.location.pathname + '?join=' + currentRoomCode;
@@ -624,6 +610,7 @@
                 updateWaitingStatus(1, gameSettings.playerCount);
             });
             
+            // Peliin liittyminen onnistui
             socket.on('gameJoined', (data) => {
                 myPlayerNumber = data.playerNumber;
                 gameSettings = {
@@ -631,8 +618,9 @@
                     bounceEnabled: data.gameState.bounceEnabled
                 };
                 
-                console.log('✅ Joined battle. Pilot #', myPlayerNumber);
+                console.log('✅ Liitytty peliin. Pelaaja #', myPlayerNumber);
                 
+                // Näytä odotusruutu
                 hideAllMenus();
                 document.getElementById('waitingRoom').classList.add('show');
                 document.getElementById('roomCode').textContent = currentRoomCode;
@@ -641,8 +629,9 @@
                 updateWaitingStatus(myPlayerNumber, gameSettings.playerCount);
             });
             
+            // Pelaaja poistui
             socket.on('playerLeft', (data) => {
-                document.getElementById('message').textContent = `Pilot ${data.playerNumber} left the battle`;
+                document.getElementById('message').textContent = `Pelaaja ${data.playerNumber} poistui pelistä`;
             });
         }
         
@@ -704,7 +693,7 @@
             gameSettings.bounceEnabled = bounceEnabled;
             isHost = true;
             
-            console.log('🎮 Creating battle:', gameSettings);
+            console.log('🎮 Luodaan peli:', gameSettings);
             socket.emit('createGame', gameSettings);
         }
         
@@ -712,20 +701,20 @@
             const code = document.getElementById('codeInput').value.trim().toUpperCase();
             
             if (code.length !== 4) {
-                alert('Enter 4-character code!');
+                alert('Anna 4-merkkinen koodi!');
                 return;
             }
             
             isHost = false;
             currentRoomCode = code;
             
-            console.log('🔌 Joining battle:', code);
+            console.log('🔌 Liitytään peliin:', code);
             socket.emit('joinGame', code);
         }
         
         function updateWaitingStatus(current, total) {
             const status = document.getElementById('waitingStatus');
-            status.textContent = `Pilots ready: ${current}/${total}`;
+            status.textContent = `Pelaajia paikalla: ${current}/${total}`;
         }
         
         // ═══════════════════════════════════════════════════════════
@@ -739,28 +728,36 @@
             hideAllMenus();
             document.getElementById('gameContainer').classList.add('show');
             
+            // Aseta canvasin koko
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
             
+            // Näytä/piilota 3. pelaajan pisteet
             if (gameSettings.playerCount === 3) {
                 document.getElementById('p3ScoreContainer').style.display = 'block';
             }
             
-            console.log('📡 Registering game socket events...');
+            // Luo ohjaimet
+            createControls();
+            
+            // Alusta pelitila
+            initGame();
+            
+            // Rekisteröi pelin socket-eventit
+            console.log('📡 Rekisteröidään pelin socket-eventit...');
             if (typeof setupGameSocketEvents === 'function') {
                 setupGameSocketEvents();
             } else {
-                console.error('❌ setupGameSocketEvents not defined!');
+                console.error('❌ setupGameSocketEvents ei ole määritelty!');
             }
             
-            // Alusta peli
-            initGame(myPlayerNumber, gameSettings.playerCount, gameSettings.bounceEnabled);
-            
-            console.log('🎮 Battle begins! Pilot #' + myPlayerNumber);
-            document.getElementById('message').textContent = 'Battle begins!';
+            // Aloita peli
+            console.log('🎮 Peli alkaa! Pelaaja #' + myPlayerNumber);
+            document.getElementById('message').textContent = 'Peli alkaa!';
         }
         
         function resizeCanvas() {
+            // KIINTEÄ pelialue - optimoitu mobiilille ja tabletille
             const GAME_WIDTH = 1000;
             const GAME_HEIGHT = 550;
             
@@ -768,11 +765,8 @@
             canvas.height = GAME_HEIGHT;
         }
         
-        function createControls() {
-            // Ohjaimet luodaan game.js:ssä
-        }
-        
-        console.log('🚀 Star Wars Space Battle main program loaded!');
+        console.log('🎮 Tankkipeli Online pääohjelma ladattu!');
     </script>
+    <script src="game.js"></script>
 </body>
 </html>
