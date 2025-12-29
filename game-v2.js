@@ -593,6 +593,32 @@ class Obstacle {
         // Tallennetaan onko kehä (ei arpoa joka framessa!)
         this.hasRing = this.type === 'planet' && Math.random() > 0.6;
         this.ringAngle = Math.random() * Math.PI * 2;
+        
+        // Tallennan asteroidin muodon (ei arpoa joka framessa!)
+        if (this.type === 'asteroid') {
+            this.asteroidPoints = [];
+            const pointCount = 8;
+            for (let i = 0; i < pointCount; i++) {
+                const angle = (i / pointCount) * Math.PI * 2;
+                const variance = 0.7 + Math.random() * 0.3;
+                this.asteroidPoints.push({
+                    x: Math.cos(angle) * this.radius * variance,
+                    y: Math.sin(angle) * this.radius * variance
+                });
+            }
+            
+            // Tallennan kraatterit
+            this.craters = [];
+            for (let i = 0; i < 3; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * this.radius * 0.5;
+                this.craters.push({
+                    x: Math.cos(angle) * dist,
+                    y: Math.sin(angle) * dist,
+                    size: this.radius * 0.15
+                });
+            }
+        }
     }
     
     generateColor() {
@@ -648,35 +674,26 @@ class Obstacle {
                 ctx.stroke();
             }
         } else {
-            // Asteroidi (epäsäännöllinen kivi)
-            ctx.fillStyle = '#666666';
+            // Asteroidi (epäsäännöllinen kivi) - käytä tallennettuja pisteitä!
+            ctx.fillStyle = this.color;
             ctx.strokeStyle = '#444444';
             ctx.lineWidth = 2;
             
             ctx.beginPath();
-            const points = 8;
-            for (let i = 0; i < points; i++) {
-                const angle = (i / points) * Math.PI * 2;
-                const variance = 0.7 + Math.random() * 0.3;
-                const x = Math.cos(angle) * this.radius * variance;
-                const y = Math.sin(angle) * this.radius * variance;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+            for (let i = 0; i < this.asteroidPoints.length; i++) {
+                const point = this.asteroidPoints[i];
+                if (i === 0) ctx.moveTo(point.x, point.y);
+                else ctx.lineTo(point.x, point.y);
             }
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
             
-            // Kraatterit
+            // Kraatterit - käytä tallennettuja!
             ctx.fillStyle = '#444444';
-            for (let i = 0; i < 3; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const dist = Math.random() * this.radius * 0.5;
-                const x = Math.cos(angle) * dist;
-                const y = Math.sin(angle) * dist;
-                const size = this.radius * 0.15;
+            for (let crater of this.craters) {
                 ctx.beginPath();
-                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.arc(crater.x, crater.y, crater.size, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
@@ -863,8 +880,8 @@ function initGame(playerNumber, playerCount, bounceEnabled) {
 function generateObstacles() {
     console.log('🔥🔥🔥 DEBUG: generateObstacles() ALOITETTU! 🔥🔥🔥');
     gameState.obstacles = [];
-    // Satunnainen määrä 8-12 estettä
-    const obstacleCount = Math.floor(Math.random() * 5) + 8; // 8, 9, 10, 11 tai 12
+    // Satunnainen määrä 10-15 estettä
+    const obstacleCount = Math.floor(Math.random() * 6) + 10; // 10, 11, 12, 13, 14 tai 15
     console.log(`🔥 DEBUG: Yritetään luoda ${obstacleCount} estettä`);
     const minDistance = 80; // PIENENNETTY 150 → 80
     
