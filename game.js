@@ -1,26 +1,40 @@
 // ═══════════════════════════════════════════════════════════
-// TANKKIPELI ONLINE - PELILOGIIKKA
+// STAR WARS SPACE BATTLE - PELILOGIIKKA
 // ═══════════════════════════════════════════════════════════
 
 // Pelitila
 let gameState = {
-    tanks: [],
+    ships: [],
     bullets: [],
-    walls: [],
+    obstacles: [],
     explosions: [],
     scores: { p1: 0, p2: 0, p3: 0 },
-    gameOver: false
+    gameOver: false,
+    stars: []
 };
 
 let keys = {};
-let myTank = null;
+let myShip = null;
 
-// Tank-luokka
-class Tank {
+// Generoi tähdet taustalle
+function generateStars() {
+    gameState.stars = [];
+    for (let i = 0; i < 150; i++) {
+        gameState.stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2,
+            brightness: Math.random()
+        });
+    }
+}
+
+// Ship-luokka (X-wing, TIE-fighter, Millennium Falcon)
+class Ship {
     constructor(x, y, color, playerNumber) {
         this.x = x;
         this.y = y;
-        this.width = 40;
+        this.width = 45;
         this.angle = playerNumber === 2 ? Math.PI : 0;
         this.speed = 3;
         this.rotationSpeed = 0.05;
@@ -28,6 +42,18 @@ class Tank {
         this.playerNumber = playerNumber;
         this.alive = true;
         this.lives = 1;
+        
+        // Määritä aluksen tyyppi pelaajan numeron perusteella
+        if (playerNumber === 1) {
+            this.type = 'xwing';
+            this.name = 'X-Wing';
+        } else if (playerNumber === 2) {
+            this.type = 'tie';
+            this.name = 'TIE Fighter';
+        } else {
+            this.type = 'falcon';
+            this.name = 'Millennium Falcon';
+        }
     }
     
     update() {
@@ -36,7 +62,7 @@ class Tank {
         const oldX = this.x;
         const oldY = this.y;
         
-        // Liike (vain oma tankki)
+        // Liike (vain oma alus)
         if (this.playerNumber === myPlayerNumber) {
             if (keys.forward || keys.up) {
                 this.x += Math.cos(this.angle) * this.speed;
@@ -53,8 +79,8 @@ class Tank {
                 this.angle += this.rotationSpeed;
             }
             
-            // Törmäykset seiniin
-            if (this.checkWallCollision()) {
+            // Törmäykset esteisiin
+            if (this.checkObstacleCollision()) {
                 this.x = oldX;
                 this.y = oldY;
             }
@@ -74,12 +100,13 @@ class Tank {
         }
     }
     
-    checkWallCollision() {
-        for (let wall of gameState.walls) {
-            if (this.x - this.width / 2 < wall.x + wall.width &&
-                this.x + this.width / 2 > wall.x &&
-                this.y - this.width / 2 < wall.y + wall.height &&
-                this.y + this.width / 2 > wall.y) {
+    checkObstacleCollision() {
+        for (let obstacle of gameState.obstacles) {
+            const dx = this.x - obstacle.x;
+            const dy = this.y - obstacle.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < this.width / 2 + obstacle.radius) {
                 return true;
             }
         }
@@ -91,13 +118,14 @@ class Tank {
         
         const bulletSpeed = 8;
         const bullet = {
-            x: this.x + Math.cos(this.angle) * (this.width / 2 + 5),
-            y: this.y + Math.sin(this.angle) * (this.width / 2 + 5),
+            x: this.x + Math.cos(this.angle) * (this.width / 2 + 10),
+            y: this.y + Math.sin(this.angle) * (this.width / 2 + 10),
             vx: Math.cos(this.angle) * bulletSpeed,
             vy: Math.sin(this.angle) * bulletSpeed,
-            color: this.color,
+            color: this.type === 'tie' ? '#00ff00' : '#ff0000',
             shooter: this.playerNumber,
-            radius: 5
+            radius: 4,
+            type: this.type
         };
         
         socket.emit('bulletFired', bullet);
@@ -113,6 +141,239 @@ class Tank {
         this.lives = 1;
     }
     
+    drawXWing() {
+        // X-Wing hävittäjä (valkoinen) - edestäpäin katsottuna
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#aaaaaa';
+        ctx.lineWidth = 2;
+        
+        // Pitkä nokka (edessä)
+        ctx.fillRect(-2, -25, 4, 18);
+        ctx.strokeRect(-2, -25, 4, 18);
+        
+        // Ohjaamo (kupoli)
+        ctx.beginPath();
+        ctx.arc(0, -10, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Keskiosa (runko)
+        ctx.fillRect(-5, -10, 10, 25);
+        ctx.strokeRect(-5, -10, 10, 25);
+        
+        // S-foils (4 siipeä X-muodossa)
+        ctx.fillStyle = '#e0e0e0';
+        
+        // Ylävasen siipi (pitkä ja kapea)
+        ctx.beginPath();
+        ctx.moveTo(-5, -5);
+        ctx.lineTo(-22, -22);
+        ctx.lineTo(-24, -22);
+        ctx.lineTo(-24, -18);
+        ctx.lineTo(-7, -3);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Moottori ylävasemmalla
+        ctx.fillStyle = '#cccccc';
+        ctx.fillRect(-26, -23, 4, 6);
+        ctx.strokeRect(-26, -23, 4, 6);
+        ctx.fillStyle = '#ff6666';
+        ctx.fillRect(-26, -21, 4, 2);
+        
+        // Yläoikea siipi
+        ctx.fillStyle = '#e0e0e0';
+        ctx.beginPath();
+        ctx.moveTo(5, -5);
+        ctx.lineTo(22, -22);
+        ctx.lineTo(24, -22);
+        ctx.lineTo(24, -18);
+        ctx.lineTo(7, -3);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Moottori yläoikealla
+        ctx.fillStyle = '#cccccc';
+        ctx.fillRect(22, -23, 4, 6);
+        ctx.strokeRect(22, -23, 4, 6);
+        ctx.fillStyle = '#ff6666';
+        ctx.fillRect(22, -21, 4, 2);
+        
+        // Alavasen siipi
+        ctx.fillStyle = '#e0e0e0';
+        ctx.beginPath();
+        ctx.moveTo(-5, 10);
+        ctx.lineTo(-22, 22);
+        ctx.lineTo(-24, 22);
+        ctx.lineTo(-24, 18);
+        ctx.lineTo(-7, 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Moottori alavasemmalla
+        ctx.fillStyle = '#cccccc';
+        ctx.fillRect(-26, 17, 4, 6);
+        ctx.strokeRect(-26, 17, 4, 6);
+        ctx.fillStyle = '#ff6666';
+        ctx.fillRect(-26, 19, 4, 2);
+        
+        // Alaoikea siipi
+        ctx.fillStyle = '#e0e0e0';
+        ctx.beginPath();
+        ctx.moveTo(5, 10);
+        ctx.lineTo(22, 22);
+        ctx.lineTo(24, 22);
+        ctx.lineTo(24, 18);
+        ctx.lineTo(7, 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Moottori alaoikealla
+        ctx.fillStyle = '#cccccc';
+        ctx.fillRect(22, 17, 4, 6);
+        ctx.strokeRect(22, 17, 4, 6);
+        ctx.fillStyle = '#ff6666';
+        ctx.fillRect(22, 19, 4, 2);
+    }
+    
+    drawTIEFighter() {
+        // TIE Fighter (vaalean sinertävä-harmaa) - käännetty 90 astetta
+        ctx.strokeStyle = '#b0c4de';
+        ctx.fillStyle = '#708090';
+        ctx.lineWidth = 2;
+        
+        // Keskipallo (ohjaamo)
+        ctx.beginPath();
+        ctx.arc(0, 0, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Ikkunat keskipallossa
+        ctx.fillStyle = '#333333';
+        ctx.beginPath();
+        ctx.arc(-2, -2, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(2, -2, 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Yläsiipi (kuusikulmio) - käännetty pystyyn
+        ctx.fillStyle = '#708090';
+        ctx.strokeStyle = '#b0c4de';
+        ctx.beginPath();
+        ctx.moveTo(-15, -10);
+        ctx.lineTo(-18, -25);
+        ctx.lineTo(18, -25);
+        ctx.lineTo(15, -10);
+        ctx.lineTo(-15, -10);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Siiven yksityiskohdat (vaakaviivat)
+        ctx.strokeStyle = '#556677';
+        ctx.lineWidth = 1;
+        for (let i = -12; i < 12; i += 4) {
+            ctx.beginPath();
+            ctx.moveTo(i, -10);
+            ctx.lineTo(i, -25);
+            ctx.stroke();
+        }
+        
+        // Alasiipi (kuusikulmio) - käännetty pystyyn
+        ctx.fillStyle = '#708090';
+        ctx.strokeStyle = '#b0c4de';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-15, 10);
+        ctx.lineTo(-18, 25);
+        ctx.lineTo(18, 25);
+        ctx.lineTo(15, 10);
+        ctx.lineTo(-15, 10);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Siiven yksityiskohdat (vaakaviivat)
+        ctx.strokeStyle = '#556677';
+        ctx.lineWidth = 1;
+        for (let i = -12; i < 12; i += 4) {
+            ctx.beginPath();
+            ctx.moveTo(i, 10);
+            ctx.lineTo(i, 25);
+            ctx.stroke();
+        }
+    }
+    }
+    
+    drawMillenniumFalcon() {
+        // Millennium Falcon (harmaa, pyöreähkö)
+        ctx.fillStyle = '#9e9e9e';
+        ctx.strokeStyle = '#666666';
+        ctx.lineWidth = 2;
+        
+        // Päärunko (soikea)
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 22, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Ohjaamo (kupoli edessä)
+        ctx.fillStyle = '#4a90e2';
+        ctx.beginPath();
+        ctx.ellipse(-5, -6, 4, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Hyperdrive-säiliöt (sivuilla)
+        ctx.fillStyle = '#7a7a7a';
+        ctx.strokeStyle = '#555555';
+        ctx.fillRect(-18, -10, 8, 5);
+        ctx.strokeRect(-18, -10, 8, 5);
+        ctx.fillRect(-18, 5, 8, 5);
+        ctx.strokeRect(-18, 5, 8, 5);
+        
+        // Tutkaantenni (sivussa)
+        ctx.fillStyle = '#666666';
+        ctx.beginPath();
+        ctx.arc(18, -8, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(18, -8);
+        ctx.lineTo(22, -12);
+        ctx.stroke();
+        
+        // Yksityiskohtia (paneelit)
+        ctx.strokeStyle = '#777777';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-15, -8);
+        ctx.lineTo(10, -8);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-15, 0);
+        ctx.lineTo(15, 0);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-15, 8);
+        ctx.lineTo(10, 8);
+        ctx.stroke();
+        
+        // Moottoreiden hehku (takana, sininen)
+        ctx.fillStyle = '#00bfff';
+        ctx.beginPath();
+        ctx.arc(22, -5, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(22, 5, 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
     draw() {
         if (!this.alive) return;
         
@@ -120,34 +381,20 @@ class Tank {
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle);
         
-        // Runko (suorakulmio)
-        ctx.fillStyle = this.color;
-        ctx.fillRect(-this.width / 2, -this.width / 2.5, this.width, this.width * 0.8);
-        
-        // Runko reuna (musta)
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(-this.width / 2, -this.width / 2.5, this.width, this.width * 0.8);
-        
-        // Torni (pienempi neliö keskellä)
-        ctx.fillStyle = this.color;
-        ctx.fillRect(-8, -8, 16, 16);
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(-8, -8, 16, 16);
-        
-        // Putki (tykin piippu)
-        ctx.fillStyle = this.color;
-        ctx.fillRect(0, -3, this.width / 2 + 5, 6);
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(0, -3, this.width / 2 + 5, 6);
+        // Piirrä oikea alus tyypin mukaan
+        if (this.type === 'xwing') {
+            this.drawXWing();
+        } else if (this.type === 'tie') {
+            this.drawTIEFighter();
+        } else if (this.type === 'falcon') {
+            this.drawMillenniumFalcon();
+        }
         
         ctx.restore();
         
         // Pelaajan numero
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 14px Arial';
+        ctx.fillStyle = '#ffff00';
+        ctx.font = 'bold 12px Arial';
         ctx.textAlign = 'center';
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 3;
@@ -156,7 +403,7 @@ class Tank {
     }
 }
 
-// Bullet-luokka
+// Bullet-luokka (laser-ammukset)
 class Bullet {
     constructor(data) {
         this.x = data.x;
@@ -165,11 +412,12 @@ class Bullet {
         this.vy = data.vy;
         this.color = data.color;
         this.shooter = data.shooter;
-        this.radius = data.radius || 5;
+        this.radius = data.radius || 4;
         this.id = data.id;
         this.active = true;
         this.bounces = 0;
         this.maxBounces = gameSettings.bounceEnabled ? 3 : 0;
+        this.type = data.type || 'xwing';
     }
     
     update() {
@@ -199,28 +447,24 @@ class Bullet {
                 }
             }
         } else {
-            // Ei kimpoamista, tuhoa reunoilla
+            // Ei kimpoamista
             if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
                 this.active = false;
                 socket.emit('bulletDestroyed', this.id);
             }
         }
         
-        // Törmäys seiniin
-        for (let wall of gameState.walls) {
-            if (this.checkWallCollision(wall)) {
+        // Törmäys esteisiin
+        for (let obstacle of gameState.obstacles) {
+            if (this.checkObstacleCollision(obstacle)) {
                 if (gameSettings.bounceEnabled && this.bounces < this.maxBounces) {
-                    // Kimpoa seinästä
-                    const centerX = wall.x + wall.width / 2;
-                    const centerY = wall.y + wall.height / 2;
-                    const dx = this.x - centerX;
-                    const dy = this.y - centerY;
-                    
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                        this.vx *= -1;
-                    } else {
-                        this.vy *= -1;
-                    }
+                    // Kimpoa esteestä
+                    const dx = this.x - obstacle.x;
+                    const dy = this.y - obstacle.y;
+                    const angle = Math.atan2(dy, dx);
+                    const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed;
                     this.bounces++;
                 } else {
                     this.active = false;
@@ -230,180 +474,176 @@ class Bullet {
             }
         }
         
-        // Törmäys tankkeihin
-        for (let tank of gameState.tanks) {
-            if (tank.alive && tank.playerNumber !== this.shooter) {
-                const dx = this.x - tank.x;
-                const dy = this.y - tank.y;
+        // Törmäys aluksiin
+        for (let ship of gameState.ships) {
+            if (ship.alive && ship.playerNumber !== this.shooter) {
+                const dx = this.x - ship.x;
+                const dy = this.y - ship.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                if (distance < this.radius + tank.width / 2) {
+                if (distance < this.radius + ship.width / 2) {
                     // Osuma!
                     this.active = false;
                     socket.emit('bulletDestroyed', this.id);
                     socket.emit('playerHit', {
-                        victimId: tank.playerNumber,
+                        victimId: ship.playerNumber,
                         shooterId: this.shooter
                     });
                     
                     // Luo räjähdys
-                    gameState.explosions.push(new Explosion(tank.x, tank.y));
-                    tank.hit();
-                    
-                    // Tarkista onko peli ohi
-                    checkGameOver();
+                    gameState.explosions.push(new Explosion(ship.x, ship.y));
                     break;
                 }
             }
         }
     }
     
-    checkWallCollision(wall) {
-        return this.x > wall.x && this.x < wall.x + wall.width &&
-               this.y > wall.y && this.y < wall.y + wall.height;
+    checkObstacleCollision(obstacle) {
+        const dx = this.x - obstacle.x;
+        const dy = this.y - obstacle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance < this.radius + obstacle.radius;
     }
     
     draw() {
         if (!this.active) return;
         
+        // Lasersäde tyylinen ammus
+        ctx.save();
+        
+        // Hehku
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = this.color;
+        
+        // Varsinainen laser
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        const angle = Math.atan2(this.vy, this.vx);
+        ctx.translate(this.x, this.y);
+        ctx.rotate(angle);
+        ctx.fillRect(-6, -2, 12, 4);
+        ctx.restore();
+        
+        // Kirkas keskus
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius - 1, 0, Math.PI * 2);
         ctx.fill();
     }
 }
 
-// Wall-luokka
-class Wall {
-    constructor(x, y, width, height) {
+// Obstacle-luokka (planeetat ja asteroidit)
+class Obstacle {
+    constructor(x, y, radius, type) {
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
-        // Satunnainen talotyyppi
-        this.type = Math.random() > 0.5 ? 'brick' : 'concrete';
-        
-        // Luo ikkunat kerran (ei vilkkumista!)
-        this.windows = [];
-        const windowsX = Math.floor(this.width / 20);
-        const windowsY = Math.floor(this.height / 20);
-        
-        for (let wy = 0; wy < windowsY; wy++) {
-            for (let wx = 0; wx < windowsX; wx++) {
-                this.windows.push({
-                    x: wx,
-                    y: wy,
-                    lit: Math.random() > 0.3 // Onko valaistuna?
-                });
-            }
+        this.radius = radius;
+        this.type = type || (Math.random() > 0.5 ? 'planet' : 'asteroid');
+        this.color = this.generateColor();
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.01;
+        // Tallennetaan onko kehä, ei arpoa joka framessa
+        this.hasRing = this.type === 'planet' && Math.random() > 0.6;
+        this.ringAngle = Math.random() * Math.PI * 2;
+    }
+    
+    generateColor() {
+        if (this.type === 'planet') {
+            // Enemmän värivaihtoehtoja
+            const colors = [
+                '#4a90e2', // sininen
+                '#e27a4a', // oranssi
+                '#7a4ae2', // violetti
+                '#4ae27a', // vihreä
+                '#e2e24a', // keltainen
+                '#e24a90', // pinkki
+                '#90e24a', // lime
+                '#4ae2e2', // syaani
+                '#e2904a', // kulta
+                '#904ae2'  // tumma violetti
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        } else {
+            // Asteroidit eri harmaansävyjä
+            const grays = ['#888888', '#666666', '#999999', '#777777', '#555555'];
+            return grays[Math.floor(Math.random() * grays.length)];
         }
     }
     
+    update() {
+        this.rotation += this.rotationSpeed;
+    }
+    
     draw() {
-        if (this.type === 'brick') {
-            // TIILITALO (oranssi/ruskea)
-            ctx.fillStyle = '#A0522D'; // Tiili
-            ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        
+        if (this.type === 'planet') {
+            // Planeetta (pallo varjostuksella)
+            const gradient = ctx.createRadialGradient(-this.radius/3, -this.radius/3, 0, 0, 0, this.radius);
+            gradient.addColorStop(0, this.color);
+            gradient.addColorStop(0.7, this.darkenColor(this.color, 0.5));
+            gradient.addColorStop(1, this.darkenColor(this.color, 0.8));
             
-            // Reunat
-            ctx.strokeStyle = '#654321';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(this.x, this.y, this.width, this.height);
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+            ctx.fill();
             
-            // Tiilirivit
-            const brickHeight = 12;
-            const brickWidth = 20;
-            ctx.strokeStyle = '#8B4513';
+            // Planeetan renkaat (JOS hasRing on true)
+            if (this.hasRing) {
+                ctx.strokeStyle = this.color + '80';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.radius * 1.5, this.radius * 0.3, this.ringAngle, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        } else {
+            // Asteroidi (epäsäännöllinen kivi)
+            ctx.fillStyle = this.color;
+            ctx.strokeStyle = this.darkenColor(this.color, 0.7);
             ctx.lineWidth = 2;
             
-            for (let row = 0; row * brickHeight < this.height; row++) {
-                const offsetX = (row % 2) * (brickWidth / 2);
-                for (let col = 0; col * brickWidth < this.width + brickWidth; col++) {
-                    const bx = this.x + col * brickWidth - offsetX;
-                    const by = this.y + row * brickHeight;
-                    if (bx >= this.x && bx < this.x + this.width) {
-                        ctx.strokeRect(bx, by, brickWidth, brickHeight);
-                    }
-                }
+            ctx.beginPath();
+            const points = 8;
+            for (let i = 0; i < points; i++) {
+                const angle = (i / points) * Math.PI * 2;
+                const variance = 0.7 + Math.random() * 0.3;
+                const x = Math.cos(angle) * this.radius * variance;
+                const y = Math.sin(angle) * this.radius * variance;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
             }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
             
-            // Ikkunat (tallennetut, ei vilkkumista)
-            const windowSize = 8;
-            const windowsX = Math.floor(this.width / 25);
-            const windowsY = Math.floor(this.height / 25);
-            
-            let windowIndex = 0;
-            for (let wy = 0; wy < windowsY; wy++) {
-                for (let wx = 0; wx < windowsX; wx++) {
-                    const winX = this.x + (wx + 1) * (this.width / (windowsX + 1)) - windowSize / 2;
-                    const winY = this.y + (wy + 1) * (this.height / (windowsY + 1)) - windowSize / 2;
-                    
-                    // Ikkuna (käytä tallennettua tilaa)
-                    const window = this.windows[windowIndex] || { lit: false };
-                    ctx.fillStyle = window.lit ? '#FFD700' : '#444';
-                    ctx.fillRect(winX, winY, windowSize, windowSize);
-                    
-                    // Ikkunan reuna
-                    ctx.strokeStyle = '#333';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(winX, winY, windowSize, windowSize);
-                    
-                    windowIndex++;
-                }
-            }
-            
-            // Ovi (jos riittävän leveä)
-            if (this.width > 40 && this.height > 40) {
-                const doorWidth = 15;
-                const doorHeight = 25;
-                const doorX = this.x + this.width / 2 - doorWidth / 2;
-                const doorY = this.y + this.height - doorHeight;
-                
-                ctx.fillStyle = '#4A2C2A'; // Tumma ruskea ovi
-                ctx.fillRect(doorX, doorY, doorWidth, doorHeight);
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(doorX, doorY, doorWidth, doorHeight);
-            }
-            
-        } else {
-            // BETONITALO (harmaa kerrostalo)
-            ctx.fillStyle = '#6B6B6B'; // Betoni
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-            
-            // Reunat
-            ctx.strokeStyle = '#4A4A4A';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(this.x, this.y, this.width, this.height);
-            
-            // Ikkunat (tallennetut, ei vilkkumista)
-            const windowSize = 8;
-            const windowsX = Math.floor(this.width / 20);
-            const windowsY = Math.floor(this.height / 20);
-            
-            let windowIndex = 0;
-            for (let wy = 0; wy < windowsY; wy++) {
-                for (let wx = 0; wx < windowsX; wx++) {
-                    const winX = this.x + (wx + 1) * (this.width / (windowsX + 1)) - windowSize / 2;
-                    const winY = this.y + (wy + 1) * (this.height / (windowsY + 1)) - windowSize / 2;
-                    
-                    // Ikkuna (käytä tallennettua tilaa)
-                    const window = this.windows[windowIndex] || { lit: false };
-                    ctx.fillStyle = window.lit ? '#87CEEB' : '#333';
-                    ctx.fillRect(winX, winY, windowSize, windowSize);
-                    
-                    // Ikkunan reuna
-                    ctx.strokeStyle = '#222';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(winX, winY, windowSize, windowSize);
-                    
-                    windowIndex++;
-                }
+            // Kraatterit
+            ctx.fillStyle = this.darkenColor(this.color, 0.5);
+            for (let i = 0; i < 3; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * this.radius * 0.5;
+                const x = Math.cos(angle) * dist;
+                const y = Math.sin(angle) * dist;
+                const size = this.radius * 0.15;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
             }
         }
+        
+        ctx.restore();
+    }
+    
+    darkenColor(color, factor) {
+        const hex = color.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        return `rgb(${Math.floor(r * factor)}, ${Math.floor(g * factor)}, ${Math.floor(b * factor)})`;
     }
 }
-
 
 // Explosion-luokka
 class Explosion {
@@ -411,272 +651,295 @@ class Explosion {
         this.x = x;
         this.y = y;
         this.radius = 5;
-        this.maxRadius = 60;
-        this.speed = 3;
+        this.maxRadius = 50;
         this.alpha = 1;
+        this.particles = [];
+        
+        // Luo partikkeleita
+        for (let i = 0; i < 20; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 3 + 1;
+            this.particles.push({
+                x: this.x,
+                y: this.y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                radius: Math.random() * 3 + 1,
+                alpha: 1
+            });
+        }
     }
     
     update() {
-        this.radius += this.speed;
-        this.alpha = 1 - (this.radius / this.maxRadius);
-    }
-    
-    isDead() {
-        return this.radius >= this.maxRadius;
+        this.radius += 2;
+        this.alpha -= 0.02;
+        
+        this.particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.alpha -= 0.02;
+        });
     }
     
     draw() {
+        // Pääräjähdys
         ctx.save();
         ctx.globalAlpha = this.alpha;
         
-        // Ulompi ympyrä (punainen)
-        ctx.fillStyle = '#FF0000';
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+        gradient.addColorStop(0, '#ffff00');
+        gradient.addColorStop(0.5, '#ff6600');
+        gradient.addColorStop(1, '#ff0000');
+        
+        ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
         
-        // Sisempi ympyrä (keltainen)
-        ctx.fillStyle = '#FFD700';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI * 2);
-        ctx.fill();
-        
         ctx.restore();
-    }
-}
-
-// Alusta peli
-function initGame() {
-    // Luo tankit ENSIN (jotta generateWalls voi käyttää niitä turvavyöhykkeisiin)
-    const colors = ['#00FF00', '#FF5722', '#2196F3'];
-    const positions = [
-        { x: 80, y: canvas.height / 2 },  // Vasen reuna
-        { x: canvas.width - 80, y: canvas.height / 2 },  // Oikea reuna
-        { x: canvas.width / 2, y: 80 }  // Yläreuna
-    ];
-    
-    gameState.tanks = [];
-    for (let i = 0; i < gameSettings.playerCount; i++) {
-        const tank = new Tank(
-            positions[i].x,
-            positions[i].y,
-            colors[i],
-            i + 1
-        );
-        gameState.tanks.push(tank);
-    }
-    
-    // Generoi seinät TANKKIEN JÄLKEEN (välttää tankkien spawn-pisteitä)
-    if (isHost) {
-        generateWalls();
-    }
-    
-    // Assignoidaan oma tankki LOPUKSI
-    for (let i = 0; i < gameState.tanks.length; i++) {
-        if (gameState.tanks[i].playerNumber === myPlayerNumber) {
-            myTank = gameState.tanks[i];
-            break;
-        }
-    }
-    
-    // Aloita game loop
-    gameLoop();
-}
-
-// Generoi seinät (vain host lähettää)
-function generateWalls() {
-    gameState.walls = [];
-    const wallCount = 8;
-    
-    // Suurempi turvavyöhyke tankeille (300x300px)
-    const safeZones = gameState.tanks.map(tank => ({
-        x: tank.x - 150,
-        y: tank.y - 150,
-        width: 300,
-        height: 300
-    }));
-    
-    for (let i = 0; i < wallCount; i++) {
-        let validPosition = false;
-        let wall;
-        let attempts = 0;
         
-        while (!validPosition && attempts < 50) {
-            const width = Math.floor(Math.random() * canvas.width * 0.15) + canvas.width * 0.05;
-            const height = Math.random() < 0.3 ? 
-                Math.floor(Math.random() * canvas.height * 0.17) + canvas.height * 0.1 :
-                Math.floor(Math.random() * canvas.height * 0.1) + canvas.height * 0.067;
-            
-            const x = Math.floor(Math.random() * (canvas.width - width - canvas.width * 0.08)) + canvas.width * 0.04;
-            const y = Math.floor(Math.random() * (canvas.height - height - canvas.height * 0.17)) + canvas.height * 0.08;
-            
-            wall = new Wall(x, y, width, height);
-            
-            // Tarkista ettei ole tankien turvavyöhykkeillä
-            validPosition = safeZones.every(zone => 
-                !(x < zone.x + zone.width &&
-                  x + width > zone.x &&
-                  y < zone.y + zone.height &&
-                  y + height > zone.y)
-            );
-            
-            // Tarkista ettei ole liian lähellä muita seiniä
-            if (validPosition) {
-                validPosition = gameState.walls.every(other =>
-                    !(x < other.x + other.width + 30 &&
-                      x + width > other.x - 30 &&
-                      y < other.y + other.height + 30 &&
-                      y + height > other.y - 30)
-                );
+        // Partikkelit
+        this.particles.forEach(p => {
+            if (p.alpha > 0) {
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = '#ffaa00';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
             }
-            
-            attempts++;
-        }
-        
-        if (validPosition) {
-            gameState.walls.push(wall);
-        }
+        });
     }
     
-    // Lähetä seinät muille pelaajille
-    socket.emit('wallsGenerated', gameState.walls.map(w => ({
-        x: w.x, y: w.y, width: w.width, height: w.height
-    })));
-}
-
-// Piirrä tausta
-function drawBackground() {
-    ctx.fillStyle = '#1a3a1a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Katuverkko
-    ctx.fillStyle = '#4a4a4a';
-    
-    for (let y = canvas.height * 0.25; y < canvas.height; y += canvas.height * 0.37) {
-        ctx.fillRect(0, y - canvas.height * 0.025, canvas.width, canvas.height * 0.05);
-    }
-    
-    for (let x = canvas.width * 0.17; x < canvas.width; x += canvas.width * 0.23) {
-        ctx.fillRect(x - canvas.width * 0.0125, 0, canvas.width * 0.025, canvas.height);
-    }
-    
-    // Katuviivat
-    ctx.strokeStyle = '#FFD700';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([20, 15]);
-    
-    for (let y = canvas.height * 0.25; y < canvas.height; y += canvas.height * 0.37) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-    }
-    
-    for (let x = canvas.width * 0.17; x < canvas.width; x += canvas.width * 0.23) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-    }
-    
-    ctx.setLineDash([]);
-}
-
-// Pelin päivitys
-let gameOverHandled = false;
-
-function checkGameOver() {
-    const aliveTanks = gameState.tanks.filter(t => t.alive);
-    
-    if (aliveTanks.length === 1 && !gameOverHandled) {
-        gameOverHandled = true;
-        gameState.gameOver = true;
-        const winner = aliveTanks[0].playerNumber;
-        
-        document.getElementById('message').textContent = `🎉 Pelaaja ${winner} voitti!`;
-        
-        // Lähetä tulos palvelimelle (vain kerran!)
-        if (isHost) {
-            socket.emit('roundEnd', { winner });
-        }
-        
-        // Odota ja aloita uusi kierros (vain kerran!)
-        setTimeout(() => {
-            const wantNewRound = confirm('Uusi kierros, vassakuu?');
-            if (wantNewRound) {
-                resetRound();
-            }
-        }, 2000);
+    isFinished() {
+        return this.alpha <= 0;
     }
 }
 
-// Nollaa kierros
-function resetRound() {
-    gameOverHandled = false;
-    gameState.gameOver = false;
-    gameState.bullets = [];
-    gameState.explosions = [];
-    
-    gameState.tanks.forEach(tank => tank.reset());
-    
-    // Palauta alkuasennot (1000x550 pelialue)
-    const positions = [
-        { x: 80, y: canvas.height / 2 },
-        { x: canvas.width - 80, y: canvas.height / 2 },
-        { x: canvas.width / 2, y: 80 }
-    ];
-    
-    gameState.tanks.forEach((tank, i) => {
-        tank.x = positions[i].x;
-        tank.y = positions[i].y;
-    });
-    
-    if (isHost) {
-        generateWalls();
-    }
-    
-    socket.emit('newRound');
-    document.getElementById('message').textContent = '';
-}
+// ═══════════════════════════════════════════════════════════
+// PELIN PÄIVITYS & PIIRTO
+// ═══════════════════════════════════════════════════════════
 
-// Game loop
 function gameLoop() {
-    drawBackground();
+    // Päivitä
+    gameState.ships.forEach(ship => ship.update());
+    gameState.bullets.forEach(bullet => bullet.update());
+    gameState.obstacles.forEach(obstacle => obstacle.update());
+    gameState.explosions.forEach(explosion => explosion.update());
     
-    gameState.walls.forEach(wall => wall.draw());
+    // Poista vanhat räjähdykset
+    gameState.explosions = gameState.explosions.filter(e => !e.isFinished());
     
-    if (!gameState.gameOver) {
-        gameState.tanks.forEach(tank => tank.update());
-        gameState.bullets.forEach(bullet => bullet.update());
-    }
+    // Poista inaktiiviset ammukset
+    gameState.bullets = gameState.bullets.filter(b => b.active);
     
-    gameState.explosions.forEach(exp => exp.update());
-    gameState.explosions = gameState.explosions.filter(exp => !exp.isDead());
-    
-    gameState.bullets.forEach(bullet => bullet.draw());
-    gameState.explosions.forEach(exp => exp.draw());
-    gameState.tanks.forEach(tank => tank.draw());
+    // Piirrä
+    drawGame();
     
     requestAnimationFrame(gameLoop);
 }
 
-// Päivitä pisteet
-function updateScores(scores) {
-    document.getElementById('p1Score').textContent = scores.p1;
-    document.getElementById('p2Score').textContent = scores.p2;
-    document.getElementById('p3Score').textContent = scores.p3;
+function drawGame() {
+    // Tyhjennä tausta (musta avaruus)
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Piirrä tähdet
+    gameState.stars.forEach(star => {
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    
+    // Piirrä esteet (planeetat/asteroidit)
+    gameState.obstacles.forEach(obstacle => obstacle.draw());
+    
+    // Piirrä ammukset
+    gameState.bullets.forEach(bullet => bullet.draw());
+    
+    // Piirrä alukset
+    gameState.ships.forEach(ship => ship.draw());
+    
+    // Piirrä räjähdykset
+    gameState.explosions.forEach(explosion => explosion.draw());
 }
 
-// Luo ohjaimet
-function createControls() {
-    const controls = document.getElementById('controls');
-    controls.innerHTML = '';
+// ═══════════════════════════════════════════════════════════
+// PELIN ALUSTUS
+// ═══════════════════════════════════════════════════════════
+
+function initGame(playerNumber, playerCount, bounceEnabled) {
+    console.log(`🎮 Alustetaan Star Wars peli: P${playerNumber}/${playerCount}`);
     
-    // Väri pelaajan numeron mukaan
-    const colors = ['#00FF00', '#FF5722', '#2196F3'];
+    myPlayerNumber = playerNumber;
+    gameSettings = { playerCount, bounceEnabled };
+    
+    // Generoi tähdet
+    generateStars();
+    
+    // Luo alukset
+    gameState.ships = [];
+    const colors = ['#ffffff', '#708090', '#9e9e9e'];
+    
+    if (playerCount === 2) {
+        gameState.ships.push(new Ship(200, canvas.height / 2, colors[0], 1));
+        gameState.ships.push(new Ship(canvas.width - 200, canvas.height / 2, colors[1], 2));
+    } else if (playerCount === 3) {
+        gameState.ships.push(new Ship(200, canvas.height / 2, colors[0], 1));
+        gameState.ships.push(new Ship(canvas.width - 200, canvas.height / 2, colors[1], 2));
+        gameState.ships.push(new Ship(canvas.width / 2, 200, colors[2], 3));
+    }
+    
+    // Aseta oma alus
+    myShip = gameState.ships.find(s => s.playerNumber === playerNumber);
+    
+    // Generoi esteet (vain host)
+    if (playerNumber === 1) {
+        generateObstacles();
+        socket.emit('wallsGenerated', gameState.obstacles.map(o => ({
+            x: o.x,
+            y: o.y,
+            radius: o.radius,
+            type: o.type
+        })));
+    }
+    
+    // Aloita peli
+    console.log('✅ Peli alustettu! Aloitetaan game loop...');
+    gameLoop();
+    setupTouchControls();
+}
+
+function generateObstacles() {
+    gameState.obstacles = [];
+    // Satunnainen määrä esteitä 8-12
+    const obstacleCount = Math.floor(Math.random() * 5) + 8;
+    const minDistance = 120;
+    
+    for (let i = 0; i < obstacleCount; i++) {
+        let x, y, radius;
+        let attempts = 0;
+        
+        do {
+            x = Math.random() * (canvas.width - 200) + 100;
+            y = Math.random() * (canvas.height - 200) + 100;
+            // Vaihtelevat koot 20-60
+            radius = Math.random() * 40 + 20;
+            attempts++;
+        } while (attempts < 100 && !isValidObstaclePosition(x, y, radius, minDistance));
+        
+        if (attempts < 100) {
+            gameState.obstacles.push(new Obstacle(x, y, radius));
+        }
+    }
+    
+    console.log(`🪐 Generoitu ${gameState.obstacles.length} estettä`);
+}
+
+function isValidObstaclePosition(x, y, radius, minDistance) {
+    // Tarkista että ei ole liian lähellä muita esteitä
+    for (let obstacle of gameState.obstacles) {
+        const dx = x - obstacle.x;
+        const dy = y - obstacle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < radius + obstacle.radius + minDistance) {
+            return false;
+        }
+    }
+    
+    // Tarkista että ei ole liian lähellä aloituspisteitä
+    const startPositions = [
+        { x: 200, y: canvas.height / 2 },
+        { x: canvas.width - 200, y: canvas.height / 2 },
+        { x: canvas.width / 2, y: 200 }
+    ];
+    
+    // Suurempi turvavyöhyke pelaajien ympärillä
+    const playerSafetyDistance = 180;
+    
+    for (let pos of startPositions) {
+        const dx = x - pos.x;
+        const dy = y - pos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < radius + playerSafetyDistance) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function checkGameOver() {
+    const alivePlayers = gameState.ships.filter(s => s.alive);
+    
+    if (alivePlayers.length === 1) {
+        gameState.gameOver = true;
+        const winner = alivePlayers[0].playerNumber;
+        
+        document.getElementById('message').textContent = `${alivePlayers[0].name} voitti!`;
+        
+        socket.emit('roundEnd', { winner });
+        
+        setTimeout(() => {
+            resetRound();
+            socket.emit('newRound');
+        }, 3000);
+    } else if (alivePlayers.length === 0) {
+        gameState.gameOver = true;
+        document.getElementById('message').textContent = 'Tasapeli!';
+        
+        setTimeout(() => {
+            resetRound();
+            socket.emit('newRound');
+        }, 3000);
+    }
+}
+
+function resetRound() {
+    gameState.gameOver = false;
+    gameState.bullets = [];
+    gameState.explosions = [];
+    
+    gameState.ships.forEach(ship => {
+        ship.reset();
+        if (ship.playerNumber === 1) {
+            ship.x = 200;
+            ship.y = canvas.height / 2;
+            ship.angle = 0;
+        } else if (ship.playerNumber === 2) {
+            ship.x = canvas.width - 200;
+            ship.y = canvas.height / 2;
+            ship.angle = Math.PI;
+        } else if (ship.playerNumber === 3) {
+            ship.x = canvas.width / 2;
+            ship.y = 200;
+            ship.angle = Math.PI / 2;
+        }
+    });
+    
+    document.getElementById('message').textContent = '';
+}
+
+function updateScores(scores) {
+    gameState.scores = scores;
+    document.getElementById('score-p1').textContent = scores.p1;
+    document.getElementById('score-p2').textContent = scores.p2;
+    if (gameSettings.playerCount === 3) {
+        document.getElementById('score-p3').textContent = scores.p3;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+// KONTROLLIT
+// ═══════════════════════════════════════════════════════════
+
+function setupTouchControls() {
+    const controls = document.getElementById('controls');
+    const colors = ['#ffffff', '#708090', '#9e9e9e'];
     const playerColor = colors[myPlayerNumber - 1];
     
-    // Luo YKSI ohjain tälle pelaajalle
     controls.innerHTML = `
         <style>
             #controls {
@@ -707,7 +970,7 @@ function createControls() {
                 border-radius: 50%;
                 background: rgba(${hexToRgb(playerColor)}, 0.3);
                 color: ${playerColor};
-                font-size: 36px;
+                font-size: 30px;
                 font-weight: bold;
                 display: flex;
                 align-items: center;
@@ -756,7 +1019,7 @@ function createControls() {
         </style>
         
         <div class="shoot-container">
-            <button class="big-shoot-btn" id="shootBtn">🔥</button>
+            <button class="big-shoot-btn" id="shootBtn">⚡</button>
         </div>
         
         <div class="dpad-container">
@@ -772,7 +1035,6 @@ function createControls() {
         </div>
     `;
     
-    // Lisää tapahtumat
     controls.querySelectorAll('.control-btn:not(.empty)').forEach(btn => {
         btn.addEventListener('touchstart', handleControlPress);
         btn.addEventListener('touchend', handleControlRelease);
@@ -790,7 +1052,6 @@ function createControls() {
     controls.style.display = 'flex';
 }
 
-// Apufunktio: Muuta hex RGB:ksi
 function hexToRgb(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? 
@@ -816,9 +1077,9 @@ function handleControlRelease(e) {
 
 function handleShoot(e) {
     e.preventDefault();
-    if (myTank && myTank.alive) {
-        console.log('🔫 Ammutaan!');
-        myTank.shoot();
+    if (myShip && myShip.alive) {
+        console.log('⚡ Laser fired!');
+        myShip.shoot();
     }
 }
 
@@ -841,7 +1102,7 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
     }
     if (e.key === ' ' || e.key === 'Enter') {
-        if (myTank) myTank.shoot();
+        if (myShip) myShip.shoot();
         e.preventDefault();
     }
 });
@@ -857,63 +1118,51 @@ document.addEventListener('keyup', (e) => {
 // SOCKET TAPAHTUMAT
 // ═══════════════════════════════════════════════════════════
 
-// Rekisteröi pelin socket-eventit (kutsutaan kun peli alkaa)
 function setupGameSocketEvents() {
     console.log('🎮 Rekisteröidään pelin socket-eventit...');
     
-    // Toinen pelaaja liikkuu
     socket.on('playerUpdate', (data) => {
-        console.log('📥 playerUpdate:', data);
-        const tank = gameState.tanks.find(t => t.playerNumber === data.playerNumber);
-        if (tank && tank.playerNumber !== myPlayerNumber) {
-            tank.x = data.data.x;
-            tank.y = data.data.y;
-            tank.angle = data.data.angle;
+        const ship = gameState.ships.find(s => s.playerNumber === data.playerNumber);
+        if (ship && ship.playerNumber !== myPlayerNumber) {
+            ship.x = data.data.x;
+            ship.y = data.data.y;
+            ship.angle = data.data.angle;
         }
     });
 
-    // Ammus ammuttu
     socket.on('bulletFired', (data) => {
-        console.log('💥 bulletFired:', data);
         const bullet = new Bullet(data);
         gameState.bullets.push(bullet);
     });
 
-    // Ammus tuhottu
     socket.on('bulletDestroyed', (bulletId) => {
         gameState.bullets = gameState.bullets.filter(b => b.id !== bulletId);
     });
 
-    // Pelaaja osui
     socket.on('playerHit', (data) => {
-        console.log('💀 playerHit:', data);
-        const tank = gameState.tanks.find(t => t.playerNumber === data.victimId);
-        if (tank) {
-            gameState.explosions.push(new Explosion(tank.x, tank.y));
-            tank.hit();
+        const ship = gameState.ships.find(s => s.playerNumber === data.victimId);
+        if (ship) {
+            gameState.explosions.push(new Explosion(ship.x, ship.y));
+            ship.hit();
             checkGameOver();
         }
     });
 
-    // Kierros päättyi
     socket.on('roundEnd', (data) => {
         updateScores(data.scores);
     });
 
-    // Uusi kierros
     socket.on('newRound', (data) => {
         if (data.scores) {
             updateScores(data.scores);
         }
     });
 
-    // Seinät vastaanotettu
-    socket.on('wallsGenerated', (walls) => {
-        console.log('🧱 Seinät vastaanotettu:', walls.length, 'seinää');
-        gameState.walls = walls.map(w => new Wall(w.x, w.y, w.width, w.height));
+    socket.on('wallsGenerated', (obstacles) => {
+        console.log('🪐 Esteet vastaanotettu:', obstacles.length);
+        gameState.obstacles = obstacles.map(o => new Obstacle(o.x, o.y, o.radius, o.type));
     });
 
-    // Pelaaja poistui
     socket.on('playerLeft', (data) => {
         document.getElementById('message').textContent = `Pelaaja ${data.playerNumber} poistui pelistä`;
     });
@@ -921,4 +1170,4 @@ function setupGameSocketEvents() {
     console.log('✅ Pelin socket-eventit rekisteröity!');
 }
 
-console.log('🎮 Tankkipeli logiikka ladattu!');
+console.log('🚀 Star Wars Space Battle logiikka ladattu!');
