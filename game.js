@@ -142,82 +142,137 @@ class Ship {
     }
     
     drawXWing() {
-        // X-Wing hävittäjä (valkoinen)
+        // X-Wing hävittäjä (valkoinen) - edestäpäin katsottuna
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#aaaaaa';
         ctx.lineWidth = 2;
         
-        // Runko (pystysuora kara)
-        ctx.fillRect(-3, -20, 6, 40);
-        ctx.strokeRect(-3, -20, 6, 40);
-        
-        // Ohjaamo (edessä)
+        // Pitkä nokka (edessä, kapea)
         ctx.beginPath();
-        ctx.arc(0, -8, 5, 0, Math.PI * 2);
+        ctx.moveTo(-2, -25);
+        ctx.lineTo(0, -30);
+        ctx.lineTo(2, -25);
+        ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // S-foils (4 siipeä X-muodossa)
+        ctx.fillRect(-2, -25, 4, 15);
+        ctx.strokeRect(-2, -25, 4, 15);
+        
+        // Ohjaamo (kupoli)
+        ctx.beginPath();
+        ctx.arc(0, -12, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Ikkuna ohjaamossa
+        ctx.fillStyle = '#4169E1';
+        ctx.beginPath();
+        ctx.arc(0, -12, 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Keskiosa (runko)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-5, -10, 10, 25);
+        ctx.strokeRect(-5, -10, 10, 25);
+        
+        // S-foils (4 siipeä X-muodossa) - valkoiset
         ctx.fillStyle = '#e0e0e0';
         
-        // Ylävasen siipi
+        // Ylävasen siipi (pitkä ja kapea)
         ctx.beginPath();
-        ctx.moveTo(-3, -15);
-        ctx.lineTo(-20, -25);
-        ctx.lineTo(-20, -20);
-        ctx.lineTo(-3, -12);
+        ctx.moveTo(-5, -8);
+        ctx.lineTo(-22, -24);
+        ctx.lineTo(-24, -24);
+        ctx.lineTo(-24, -20);
+        ctx.lineTo(-7, -6);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+        
+        // Moottori ylävasemmalla (pitkä putki)
+        ctx.fillStyle = '#cccccc';
+        ctx.fillRect(-26, -25, 4, 7);
+        ctx.strokeRect(-26, -25, 4, 7);
+        // Punainen hehku
+        ctx.fillStyle = '#ff3333';
+        ctx.fillRect(-26, -22, 4, 3);
         
         // Yläoikea siipi
+        ctx.fillStyle = '#e0e0e0';
         ctx.beginPath();
-        ctx.moveTo(3, -15);
-        ctx.lineTo(20, -25);
-        ctx.lineTo(20, -20);
-        ctx.lineTo(3, -12);
+        ctx.moveTo(5, -8);
+        ctx.lineTo(22, -24);
+        ctx.lineTo(24, -24);
+        ctx.lineTo(24, -20);
+        ctx.lineTo(7, -6);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+        
+        // Moottori yläoikealla
+        ctx.fillStyle = '#cccccc';
+        ctx.fillRect(22, -25, 4, 7);
+        ctx.strokeRect(22, -25, 4, 7);
+        // Punainen hehku
+        ctx.fillStyle = '#ff3333';
+        ctx.fillRect(22, -22, 4, 3);
         
         // Alavasen siipi
+        ctx.fillStyle = '#e0e0e0';
         ctx.beginPath();
-        ctx.moveTo(-3, 15);
-        ctx.lineTo(-20, 25);
-        ctx.lineTo(-20, 20);
-        ctx.lineTo(-3, 12);
+        ctx.moveTo(-5, 10);
+        ctx.lineTo(-22, 24);
+        ctx.lineTo(-24, 24);
+        ctx.lineTo(-24, 20);
+        ctx.lineTo(-7, 8);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+        
+        // Moottori alavasemmalla
+        ctx.fillStyle = '#cccccc';
+        ctx.fillRect(-26, 18, 4, 7);
+        ctx.strokeRect(-26, 18, 4, 7);
+        // Punainen hehku
+        ctx.fillStyle = '#ff3333';
+        ctx.fillRect(-26, 19, 4, 3);
         
         // Alaoikea siipi
+        ctx.fillStyle = '#e0e0e0';
         ctx.beginPath();
-        ctx.moveTo(3, 15);
-        ctx.lineTo(20, 25);
-        ctx.lineTo(20, 20);
-        ctx.lineTo(3, 12);
+        ctx.moveTo(5, 10);
+        ctx.lineTo(22, 24);
+        ctx.lineTo(24, 24);
+        ctx.lineTo(24, 20);
+        ctx.lineTo(7, 8);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // Moottorit siipien päissä (punaiset hehkut)
-        ctx.fillStyle = '#ff6666';
+        // Moottori alaoikealla
+        ctx.fillStyle = '#cccccc';
+        ctx.fillRect(22, 18, 4, 7);
+        ctx.strokeRect(22, 18, 4, 7);
+        // Punainen hehku
+        ctx.fillStyle = '#ff3333';
+        ctx.fillRect(22, 19, 4, 3);
+        
+        // Yksityiskohtia runkoon (viivat)
+        ctx.strokeStyle = '#aaaaaa';
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(-20, -22.5, 2, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.moveTo(-5, 0);
+        ctx.lineTo(5, 0);
+        ctx.stroke();
         ctx.beginPath();
-        ctx.arc(20, -22.5, 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(-20, 22.5, 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(20, 22.5, 2, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.moveTo(-5, 8);
+        ctx.lineTo(5, 8);
+        ctx.stroke();
     }
     
     drawTIEFighter() {
-        // TIE Fighter (vaalean sinertävä-harmaa)
+        // TIE Fighter (vaalean sinertävä-harmaa) - käännetty 90 astetta
         ctx.strokeStyle = '#b0c4de';
         ctx.fillStyle = '#708090';
         ctx.lineWidth = 2;
@@ -237,50 +292,50 @@ class Ship {
         ctx.arc(2, -2, 2, 0, Math.PI * 2);
         ctx.fill();
         
-        // Vasen siipi (kuusikulmio)
+        // Yläsiipi (kuusikulmio) - käännetty pystyyn
         ctx.fillStyle = '#708090';
         ctx.strokeStyle = '#b0c4de';
         ctx.beginPath();
-        ctx.moveTo(-10, -15);
-        ctx.lineTo(-25, -18);
-        ctx.lineTo(-25, 18);
-        ctx.lineTo(-10, 15);
-        ctx.lineTo(-10, -15);
+        ctx.moveTo(-15, -10);
+        ctx.lineTo(-18, -25);
+        ctx.lineTo(18, -25);
+        ctx.lineTo(15, -10);
+        ctx.lineTo(-15, -10);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // Siiven yksityiskohdat (viivat)
+        // Siiven yksityiskohdat (pystyviivat)
         ctx.strokeStyle = '#556677';
         ctx.lineWidth = 1;
         for (let i = -12; i < 12; i += 4) {
             ctx.beginPath();
-            ctx.moveTo(-10, i);
-            ctx.lineTo(-25, i);
+            ctx.moveTo(i, -10);
+            ctx.lineTo(i, -25);
             ctx.stroke();
         }
         
-        // Oikea siipi (kuusikulmio)
+        // Alasiipi (kuusikulmio) - käännetty pystyyn
         ctx.fillStyle = '#708090';
         ctx.strokeStyle = '#b0c4de';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(10, -15);
-        ctx.lineTo(25, -18);
-        ctx.lineTo(25, 18);
-        ctx.lineTo(10, 15);
-        ctx.lineTo(10, -15);
+        ctx.moveTo(-15, 10);
+        ctx.lineTo(-18, 25);
+        ctx.lineTo(18, 25);
+        ctx.lineTo(15, 10);
+        ctx.lineTo(-15, 10);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // Siiven yksityiskohdat (viivat)
+        // Siiven yksityiskohdat (pystyviivat)
         ctx.strokeStyle = '#556677';
         ctx.lineWidth = 1;
         for (let i = -12; i < 12; i += 4) {
             ctx.beginPath();
-            ctx.moveTo(10, i);
-            ctx.lineTo(25, i);
+            ctx.moveTo(i, 10);
+            ctx.lineTo(i, 25);
             ctx.stroke();
         }
     }
@@ -517,14 +572,31 @@ class Obstacle {
         this.color = this.generateColor();
         this.rotation = Math.random() * Math.PI * 2;
         this.rotationSpeed = (Math.random() - 0.5) * 0.01;
+        // Tallennetaan onko kehä (ei arpoa joka framessa!)
+        this.hasRing = this.type === 'planet' && Math.random() > 0.6;
+        this.ringAngle = Math.random() * Math.PI * 2;
     }
     
     generateColor() {
         if (this.type === 'planet') {
-            const colors = ['#4a90e2', '#e27a4a', '#7a4ae2', '#4ae27a', '#e2e24a'];
+            // Enemmän värivaihtoehtoja planeetoille
+            const colors = [
+                '#4a90e2', // sininen
+                '#e27a4a', // oranssi
+                '#7a4ae2', // violetti
+                '#4ae27a', // vihreä
+                '#e2e24a', // keltainen
+                '#e24a90', // pinkki
+                '#90e24a', // lime
+                '#4ae2e2', // syaani
+                '#e2904a', // kulta
+                '#904ae2'  // tumma violetti
+            ];
             return colors[Math.floor(Math.random() * colors.length)];
         } else {
-            return '#888888';
+            // Asteroidit eri harmaansävyjä
+            const grays = ['#888888', '#666666', '#999999', '#777777', '#555555'];
+            return grays[Math.floor(Math.random() * grays.length)];
         }
     }
     
@@ -549,12 +621,12 @@ class Obstacle {
             ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
             ctx.fill();
             
-            // Planeetan renkaat (joillakin)
-            if (Math.random() > 0.7) {
+            // Planeetan renkaat (JOS hasRing on true)
+            if (this.hasRing) {
                 ctx.strokeStyle = this.color + '80';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
-                ctx.ellipse(0, 0, this.radius * 1.5, this.radius * 0.3, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, this.radius * 1.5, this.radius * 0.3, this.ringAngle, 0, Math.PI * 2);
                 ctx.stroke();
             }
         } else {
@@ -772,7 +844,8 @@ function initGame(playerNumber, playerCount, bounceEnabled) {
 
 function generateObstacles() {
     gameState.obstacles = [];
-    const obstacleCount = 6;
+    // Satunnainen määrä 8-12 estettä
+    const obstacleCount = Math.floor(Math.random() * 5) + 8; // 8, 9, 10, 11 tai 12
     const minDistance = 150;
     
     for (let i = 0; i < obstacleCount; i++) {
@@ -782,11 +855,12 @@ function generateObstacles() {
         do {
             x = Math.random() * (canvas.width - 200) + 100;
             y = Math.random() * (canvas.height - 200) + 100;
-            radius = Math.random() * 30 + 40;
+            // Suurempi kokovaihtelu: 20-60 pikseliä
+            radius = Math.random() * 40 + 20;
             attempts++;
-        } while (attempts < 50 && !isValidObstaclePosition(x, y, radius, minDistance));
+        } while (attempts < 100 && !isValidObstaclePosition(x, y, radius, minDistance));
         
-        if (attempts < 50) {
+        if (attempts < 100) {
             gameState.obstacles.push(new Obstacle(x, y, radius));
         }
     }
@@ -812,11 +886,14 @@ function isValidObstaclePosition(x, y, radius, minDistance) {
         { x: canvas.width / 2, y: 200 }
     ];
     
+    // Suurempi turvavyöhyke pelaajien ympärillä
+    const playerSafetyDistance = 180;
+    
     for (let pos of startPositions) {
         const dx = x - pos.x;
         const dy = y - pos.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < radius + minDistance) {
+        if (distance < radius + playerSafetyDistance) {
             return false;
         }
     }
@@ -831,22 +908,19 @@ function checkGameOver() {
         gameState.gameOver = true;
         const winner = alivePlayers[0].playerNumber;
         
-        document.getElementById('message').textContent = `${alivePlayers[0].name} voitti!`;
+        // Näytetään voittoboksi
+        setTimeout(() => {
+            showWinDialog(alivePlayers[0].name);
+        }, 1000);
         
         socket.emit('roundEnd', { winner });
-        
-        setTimeout(() => {
-            resetRound();
-            socket.emit('newRound');
-        }, 3000);
     } else if (alivePlayers.length === 0) {
         gameState.gameOver = true;
-        document.getElementById('message').textContent = 'Tasapeli!';
         
+        // Näytetään voittoboksi tasapelille
         setTimeout(() => {
-            resetRound();
-            socket.emit('newRound');
-        }, 3000);
+            showWinDialog('Tasapeli');
+        }, 1000);
     }
 }
 
@@ -873,6 +947,10 @@ function resetRound() {
     });
     
     document.getElementById('message').textContent = '';
+    // Piilota voittoboksi
+    if (typeof hideWinDialog === 'function') {
+        hideWinDialog();
+    }
 }
 
 function updateScores(scores) {
